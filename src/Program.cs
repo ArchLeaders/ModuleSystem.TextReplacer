@@ -1,4 +1,4 @@
-﻿using MessageStudio.Formats.BinaryText;
+﻿using AeonSake.NintendoTools.FileFormats.Msbt;
 using SarcLibrary;
 using TotkCommon;
 
@@ -69,18 +69,22 @@ if (Console.ReadLine() is not { } replacement || string.IsNullOrWhiteSpace(repla
 }
 
 foreach (var (file, data) in mals) {
-    Console.WriteLine($"Searching {file}...");
+    // Console.WriteLine($"Searching {file}...");
 
-    var msbt = Msbt.FromBinary(data);
+    using var ms = new MemoryStream(data.Array!);
+    ms.Seek(data.Offset, SeekOrigin.Begin);
+    var msbt = new MsbtFileReader().Read(ms);
     
     bool foundIn = false;
-    foreach (var (key, value) in msbt.Where(kvp => kvp.Value.Text?.Contains(find) is true)) {
-        Console.WriteLine($"Replaced all occurrences of {find} in {key}");
-        value.Text = value.Text!.Replace(find, replacement);
+    foreach (var msg in msbt.Messages.Where(kvp => kvp.Text.Contains(find))) {
+        Console.WriteLine($"{msg.Label}");
+        msg.Text = msg.Text.Replace(find, replacement);
         foundIn = true;
     }
     
-    mals[file] = msbt.ToBinary();
+    using var wms = new MemoryStream();
+    new MsbtFileWriter().Write(msbt, wms);
+    mals[file] = wms.ToArray();
 
     if (foundIn) {
         Console.WriteLine($"Replaced all occurrences of {find} in {file}");

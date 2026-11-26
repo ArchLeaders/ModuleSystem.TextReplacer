@@ -8,9 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AeonSake.NintendoTools" Version="3.8.0" />
     <PackageReference Include="TotkCommon" Version="1.3.3" />
     <PackageReference Include="SarcLibrary" Version="3.3.5" />
-    <PackageReference Include="MessageStudio" Version="1.1.1" />
   </ItemGroup>
 
 </Project>
